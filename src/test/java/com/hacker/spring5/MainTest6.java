@@ -1,16 +1,10 @@
 package com.hacker.spring5;
 
 import com.hacker.spring5.config.ApplicationContextConfig6;
-import com.hacker.spring5.processor.MyBeanProcessor;
+import com.hacker.spring5.processor.MyBeanPostProcessor;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-/**
- * @author Hacker
- * @date：2018/12/24
- * @project spring
- * @describe
- */
 public class MainTest6 {
 
     AnnotationConfigApplicationContext ctx;
@@ -20,7 +14,7 @@ public class MainTest6 {
     }
 
     @Test
-    public void testBeanPostProcessor(){
-       ctx.getBean(MyBeanProcessor.class);
+    public void testBeanPostProcessor() {
+         ctx.getBean(MyBeanPostProcessor.class);
     }
 }
