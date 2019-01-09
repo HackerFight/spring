@@ -82,6 +82,9 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * 				getBean->doGetBean()->getSingleton()->
  * 			2）、创建bean
  * 				【AnnotationAwareAspectJAutoProxyCreator在所有bean创建之前会有一个拦截，InstantiationAwareBeanPostProcessor，会调用postProcessBeforeInstantiation()】
+ * 			      源码示例：AbstractAutowireCapableBeanFactory
+ * 				  // Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+ *                 Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
  * 				1）、先从缓存中获取当前bean，如果能获取到，说明bean是之前被创建过的，直接使用，否则再创建；
  * 					只要创建好的Bean都会被缓存起来
  * 				2）、createBean（）;创建bean；
@@ -105,18 +108,18 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * AnnotationAwareAspectJAutoProxyCreator【InstantiationAwareBeanPostProcessor】	的作用：
  * 1）、每一个bean创建之前，调用postProcessBeforeInstantiation()；
  * 		关心MathCalculator和LogAspect的创建
- * 		1）、判断当前bean是否在advisedBeans中（保存了所有需要增强bean）
- * 		2）、判断当前bean是否是基础类型的Advice、Pointcut、Advisor、AopInfrastructureBean，
- * 			或者是否是切面（@Aspect）
- * 		3）、是否需要跳过
- * 			1）、获取候选的增强器（切面里面的通知方法）【List<Advisor> candidateAdvisors】
- * 				每一个封装的通知方法的增强器是 InstantiationModelAwarePointcutAdvisor；
+ * 		1）、判断当前bean是否在advisedBeans中（保存了所有需要增强bean，在 AbstractAutoProxyCreator 类的 postProcessBeforeInstantiation 重写方法中
+ * 		2）、判断当前bean是否是基础类型的Advice、Pointcut、Advisor、AopInfrastructureBean， 【isInfrastructureClass(beanClass)】
+ * 			或者是否是切面（@Aspect, 这个在 AnnotationAwareAspectJAutoProxyCreator 的 isInfrastructureClass(beanClass) 重写方法中，就看重写的就行，内部调用了父类的）
+ * 		3）、是否需要跳过 (请看实现类的方法：AspectJAwareAdvisorAutoProxyCreator)
+ * 			1）、获取候选的增强器（切面里面的通知方法）【List<Advisor> candidateAdvisors = findCandidateAdvisors();】
+ * 				每一个封装的通知方法的增强器是 InstantiationModelAwarePointcutAdvisor；（先不纠结这里，回头再看）
  * 				判断每一个增强器是否是 AspectJPointcutAdvisor 类型的；返回true
  * 			2）、永远返回false
  *
  * 2）、创建对象
- * postProcessAfterInitialization；
- * 		return wrapIfNecessary(bean, beanName, cacheKey);//包装如果需要的情况下
+ * postProcessAfterInitialization；（初始化完成之后执行的后置处理器方法)
+ * 		return wrapIfNecessary(bean, beanName, cacheKey);//包装如果需要的情况下（在 AbstractAutoProxyCreator 类中的实现）
  * 		1）、获取当前bean的所有增强器（通知方法）  Object[]  specificInterceptors
  * 			1、找到候选的所有的增强器（找哪些通知方法是需要切入当前bean方法的）
  * 			2、获取到能在bean使用的增强器。
@@ -125,6 +128,9 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * 		3）、如果当前bean需要增强，创建当前bean的代理对象；
  * 			1）、获取所有增强器（通知方法）
  * 			2）、保存到proxyFactory
+ * 		           ① return proxyFactory.getProxy(getProxyClassLoader());
+ * 		           ② 	@Override
+                        public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {} ..... 在 DefaultAopProxyFactory 类中
  * 			3）、创建代理对象：Spring自动决定
  * 				JdkDynamicAopProxy(config);jdk动态代理；
  * 				ObjenesisCglibAopProxy(config);cglib的动态代理；
@@ -132,10 +138,11 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * 		5）、以后容器中获取到的就是这个组件的代理对象，执行目标方法的时候，代理对象就会执行通知方法的流程；
  *
  *
+ *
  * 	3）、目标方法执行	；
  * 		容器中保存了组件的代理对象（cglib增强后的对象），这个对象里面保存了详细信息（比如增强器，目标对象，xxx）；
  * 		1）、CglibAopProxy.intercept();拦截目标方法的执行
- * 		2）、根据ProxyFactory对象获取将要执行的目标方法拦截器链；
+ * 		2）、根据 ProxyFactory 对象获取将要执行的目标方法拦截器链；在 DynamicAdvisedInterceptor 这个内部类中
  * 			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
  * 			1）、List<Object> interceptorList保存所有拦截器 5
  * 				一个默认的ExposeInvocationInterceptor 和 4个增强器；

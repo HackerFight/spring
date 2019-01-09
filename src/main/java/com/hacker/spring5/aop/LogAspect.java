@@ -31,8 +31,7 @@ public class LogAspect {
      * 方法 ： (..)代表所有参数,(*)代表一个参数,(*,String)代表第一个参数为任何值,第二个为String类型.
      */
     @Pointcut(value = "execution(* com.hacker.spring5.aop.MathCalculator.*(int,*))")
-    public void point() {
-    }
+    public void point() {}
 
     /**
      * 声明该方法是一个前置通知：在目标方法开始之前执行
