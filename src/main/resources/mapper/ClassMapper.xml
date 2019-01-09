@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hacker.spring5.mapper.ClassMapper">
+	<resultMap id="StudentInfoMap" type="com.hacker.spring5.transaction.ClassEntry">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="class_no" property="classNo" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 抽取表名 -->
+	<sql id="tableName">
+		t_class
+	</sql>
+
+	<!--抽取公共表字段 -->
+	<sql id="columns">
+		ID,
+		NAME,
+		CLASS_NO
+	</sql>
+
+	<!-- 抽取公共实体类属性 -->
+	<sql id="javaProps">
+		#{id,jdbcType=TINYINT},
+		#{name,jdbcType=VARCHAR},
+		#{classNo,jdbcType=INTEGER}
+	</sql>
+
+	<!-- 条件 -->
+	<sql id="condition">
+		<if test="name!= null">
+			name = #{name,jdbcType=VARCHAR},
+		</if>
+		<if test="classNo!= null">
+			class_no = #{classNo,jdbcType=VARCHAR},
+		</if>
+	</sql>
+
+	<!-- 条件 -->
+	<sql id="whereCondition">
+		<if test="id!= null">
+			 AND ID = #{id,jdbcType=TINYINT}
+		</if>
+		<if test="name!= null">
+			 AND NAME = #{name,jdbcType=VARCHAR}
+		</if>
+		<if test="classNo!= null">
+			 AND class_no = #{classNo,jdbcType=INTEGER}
+		</if>
+	</sql>
+
+	
+	<!-- 插入 -->
+	<insert id="insertClass"  useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO
+			<include refid="tableName" />
+		(
+			<include refid="columns" />
+		)
+		VALUES
+		(
+			<include refid="javaProps" />
+		)
+	</insert>
+
+	<update id="updateClass" parameterType="string">
+		UPDATE
+			<include refid="tableName" />
+		<set>
+			<include refid="condition" />
+		</set>
+		WHERE
+			CLASS_NO = #{classNo,jdbcType=VARCHAR}
+		LIMIT 1
+	</update>
+
+
+	<update id="deleteClass" parameterType="java.lang.String">
+		DELETE
+		FROM
+			<include refid="tableName" />
+		WHERE
+			CLASS_NO = #{classNo,jdbcType=VARCHAR}
+		LIMIT 1
+	</update>
+
+</mapper>
+

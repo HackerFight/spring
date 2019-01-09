@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!--AppFeedback的映射-->
+<mapper namespace="com.hacker.spring5.mapper.AppFeedbackDao">
+	<resultMap id="AppFeedbackMap" type="com.ioe.energyManagement.dataobject.AppFeedback">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="app_code" property="appCode" jdbcType="INTEGER" />
+		<result column="account_id" property="accountId" jdbcType="VARCHAR" />
+		<result column="feedback_content" property="feedbackContent" jdbcType="VARCHAR" />
+		<result column="feedback_image_url" property="feedbackImageUrl" jdbcType="VARCHAR" />
+		<result column="phone_number" property="phoneNumber" jdbcType="VARCHAR" />
+		<result column="contact_way" property="contactWay" jdbcType="VARCHAR" />
+		<result column="sys_create_time" property="sysCreateTime" jdbcType="TIMESTAMP" />
+		<result column="sys_update_time" property="sysUpdateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<!-- 抽取表名 -->
+	<sql id="tableName">
+		t_app_feedback
+	</sql>
+	
+	<!--抽取公共表字段 -->
+	<sql id="columns">
+		ID,
+		APP_CODE,
+		ACCOUNT_ID,
+		FEEDBACK_CONTENT,
+		FEEDBACK_IMAGE_URL,
+		PHONE_NUMBER,
+		CONTACT_WAY,
+		SYS_CREATE_TIME,
+		SYS_UPDATE_TIME
+	</sql>
+
+	<!-- 抽取公共实体类属性 -->
+	<sql id="javaProps">
+		#{id,jdbcType=BIGINT},
+		#{appCode,jdbcType=INTEGER},
+		#{accountId,jdbcType=VARCHAR},
+		#{feedbackContent,jdbcType=VARCHAR},
+		#{feedbackImageUrl,jdbcType=VARCHAR},
+		#{phoneNumber,jdbcType=VARCHAR},
+		#{contactWay,jdbcType=VARCHAR},
+		#{sysCreateTime,jdbcType=TIMESTAMP},
+		#{sysUpdateTime,jdbcType=TIMESTAMP}
+	</sql>
+
+	<!-- 条件 -->
+	<sql id="condition">
+		<if test="appCode!= null">
+			APP_CODE = #{appCode,jdbcType=INTEGER},
+		</if>
+		<if test="accountId!= null">
+			ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
+		</if>
+		<if test="feedbackContent!= null">
+			FEEDBACK_CONTENT = #{feedbackContent,jdbcType=VARCHAR},
+		</if>
+		<if test="feedbackImageUrl!= null">
+			FEEDBACK_IMAGE_URL = #{feedbackImageUrl,jdbcType=VARCHAR},
+		</if>
+		<if test="phoneNumber!= null">
+			PHONE_NUMBER = #{phoneNumber,jdbcType=VARCHAR},
+		</if>
+		<if test="contactWay!= null">
+			CONTACT_WAY = #{contactWay,jdbcType=VARCHAR},
+		</if>
+		<if test="sysCreateTime!= null">
+			SYS_CREATE_TIME = #{sysCreateTime,jdbcType=TIMESTAMP},
+		</if>
+		<if test="sysUpdateTime!= null">
+			SYS_UPDATE_TIME = #{sysUpdateTime,jdbcType=TIMESTAMP},
+		</if>
+	</sql>
+
+	<!-- 条件 -->
+	<sql id="whereCondition">
+		<if test="id!= null">
+			 AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="appCode!= null">
+			 AND APP_CODE = #{appCode,jdbcType=INTEGER}
+		</if>
+		<if test="accountId!= null">
+			 AND ACCOUNT_ID = #{accountId,jdbcType=VARCHAR}
+		</if>
+		<if test="feedbackContent!= null">
+			 AND FEEDBACK_CONTENT = #{feedbackContent,jdbcType=VARCHAR}
+		</if>
+		<if test="feedbackImageUrl!= null">
+			 AND FEEDBACK_IMAGE_URL = #{feedbackImageUrl,jdbcType=VARCHAR}
+		</if>
+		<if test="phoneNumber!= null">
+			 AND PHONE_NUMBER = #{phoneNumber,jdbcType=VARCHAR}
+		</if>
+		<if test="contactWay!= null">
+			 AND CONTACT_WAY = #{contactWay,jdbcType=VARCHAR}
+		</if>
+		<if test="sysCreateTime!= null">
+			 AND SYS_CREATE_TIME = #{sysCreateTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="sysUpdateTime!= null">
+			 AND SYS_UPDATE_TIME = #{sysUpdateTime,jdbcType=TIMESTAMP}
+		</if>
+	</sql>
+
+	
+	<!-- 插入 parameterType="AppFeedback" 是在全局配置文件中制定了别名 ，其实也可以不写 parameterType  -->
+	<insert id="insertAppFeedback" parameterType="AppFeedback" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO
+			<include refid="tableName" />
+		(
+			<include refid="columns" />
+		)
+		VALUES
+		(
+			<include refid="javaProps" />
+		)
+	</insert>
+
+	<!-- 根据id更新信息 -->
+	<update id="updateAppFeedbackById" parameterType="java.lang.Integer">
+		UPDATE
+			<include refid="tableName" />
+		<set>
+			<include refid="condition" />
+		</set>
+		WHERE
+			ID = #{id,jdbcType=INTEGER}
+		LIMIT 1
+	</update>
+
+	<!-- 根据id查找对应的信息 -->
+	<select id="selectAppFeedbackById" resultMap="AppFeedbackMap" parameterType="java.lang.Long">
+		SELECT
+			<include refid="columns" />
+		FROM
+			<include refid="tableName" />
+		WHERE
+			ID = #{id,jdbcType=INTEGER}
+		LIMIT 1
+	</select>
+
+	<!-- 根据条件查询记录 -->
+	<select id="selectAppFeedbackListByCond" resultMap="AppFeedbackMap" parameterType="AppFeedback">
+		SELECT
+			<include refid="columns" />
+		FROM
+			<include refid="tableName" />
+		<where> 1=1
+			<include refid="whereCondition" />
+		</where>
+		ORDER BY SYS_CREATE_TIME  DESC
+		<if test="pageQuery!=null and pageQuery.isPaging() == true">
+			limit #{pageQuery.startRow},#{pageQuery.pageSize}
+		</if>
+	</select>
+
+	<!-- 根据条件查询记录数 -->
+	<select id="selectAppFeedbackCntByCond" resultType="java.lang.Integer" parameterType="AppFeedback">
+		SELECT
+			COUNT(1)
+		FROM
+			<include refid="tableName" />
+		<where> 1=1
+			<include refid="whereCondition" />
+		</where>
+	</select>
+
+</mapper>
+

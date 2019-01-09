@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hacker.spring5.mapper.AdminUserMapper">
+	<resultMap id="AdminUserInfo" type="com.hacker.spring5.transaction.AdminUserEntity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="BIGINT" />
+		<result column="login_id" property="loginId" jdbcType="VARCHAR" />
+		<result column="login_password" property="loginPassword" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 抽取表名 -->
+	<sql id="tableName">
+		t_admin_user
+	</sql>
+
+	<!--抽取公共表字段 -->
+	<sql id="columns">
+		ID,
+		NAME,
+		USER_ID,
+		LOGIN_ID,
+		LOGIN_PASSWORD
+	</sql>
+
+	<!-- 抽取公共实体类属性 -->
+	<sql id="javaProps">
+		#{id,jdbcType=INTEGER},
+		#{name,jdbcType=VARCHAR},
+		#{userId,jdbcType=BIGINT},
+		#{loginId,jdbcType=VARCHAR},
+		#{loginPassword,jdbcType=VARCHAR}
+	</sql>
+
+	<!-- 条件 -->
+	<sql id="condition">
+		<if test="name!= null">
+			name = #{name,jdbcType=VARCHAR},
+		</if>
+		<if test="userId!= null">
+			user_id = #{userId,jdbcType=BIGINT},
+		</if>
+		<if test="loginId!= null">
+			login_id = #{loginId,jdbcType=VARCHAR},
+		</if>
+		<if test="loginPassword!= null">
+			login_password = #{loginPassword,jdbcType=INTEGER},
+		</if>
+	</sql>
+
+	<!-- 条件 -->
+	<sql id="whereCondition">
+		<if test="id!= null">
+			 AND ID = #{id,jdbcType=INTEGER}
+		</if>
+		<if test="name!= null">
+			 AND NAME = #{name,jdbcType=VARCHAR}
+		</if>
+		<if test="userId!= null">
+			 AND uesr_id = #{userId,jdbcType=BIGINT}
+		</if>
+		<if test="loginId!= null">
+			 AND login_id = #{loginId,jdbcType=VARCHAR}
+		</if>
+		<if test="loginPassword!= null">
+			 AND login_password = #{loginPassword,jdbcType=VARCHAR}
+		</if>
+	</sql>
+
+	
+	<!-- 插入 -->
+	<insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO
+			<include refid="tableName" />
+		(
+			<include refid="columns" />
+		)
+		VALUES
+		(
+			<include refid="javaProps" />
+		)
+	</insert>
+
+	<update id="updateName" parameterType="string">
+		UPDATE
+			<include refid="tableName" />
+		<set>
+			<include refid="condition" />
+		</set>
+	</update>
+
+	<select id="selectById" resultMap="AdminUserInfo" parameterType="java.lang.Long">
+		SELECT
+		<include refid="columns"/>
+		FROM
+		<include refid="tableName"/>
+		WHERE
+		user_id = #{userId,jdbcType=BIGINT}
+		LIMIT 1
+	</select>
+
+
+
+</mapper>
+
