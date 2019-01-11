@@ -8,7 +8,7 @@ import java.util.List;
  * @date 2019/1/3
  * @describe
  */
-public class Test {
+public class SimpleTest {
 
     public static int show() {
         for (int i = 0; i < 10; i++) {
