@@ -81,6 +81,18 @@
 		)
 	</insert>
 
+	<!-- 修改 -->
+	<insert id="updateById" useGeneratedKeys="true" keyProperty="id">
+		UPDATE
+		<include refid="tableName" />
+		<set>
+			<include refid="condition" />
+		</set>
+		WHERE
+		user_id = #{userId,jdbcType=INTEGER}
+		LIMIT 1
+	</insert>
+
 	<update id="updateName" parameterType="string">
 		UPDATE
 			<include refid="tableName" />
